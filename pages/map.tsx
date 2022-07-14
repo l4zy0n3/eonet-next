@@ -33,19 +33,23 @@ export interface Source {
 }
 
 export default function Map({}: Props) {
-	const [locations, setLocations] = useState<location[]>(null);
+	// const [locations, setLocations] = useState<location[]>(null);
 	const [currentLocation, setCurrentLocation] = useState<number[]>();
 	const googlemap = useRef(null);
 	useEffect(() => {
-		if (!locations)
-			fetch('https://eonet.gsfc.nasa.gov/api/v3/events')
+		async function getLocations(): Promise<Array<location>>{
+			let locations: location[]
+			if (!locations)
+			return await fetch('https://eonet.gsfc.nasa.gov/api/v3/events')
 				.then((res) => res.json())
 				.then((data) => {
 					// console.log(data["events"])
 					let locations: location[] = JSON.parse(JSON.stringify(data['events']));
 					// console.log(locations[0])
-					setLocations(locations);
-				});
+					// setLocations(locations);
+					return locations
+				});	
+		}
 		// let navigator = window.navigator;
 		async function getCurrentLocation() {
 			navigator.geolocation.getCurrentPosition(
@@ -69,7 +73,7 @@ export default function Map({}: Props) {
 			version: 'weekly',
 		});
 		let map: google.maps.Map;
-		loader.load().then(() => {
+		loader.load().then(async () => {
 			const google = window.google;
 			map = new google.maps.Map(googlemap.current, {
 				center: {
@@ -82,6 +86,7 @@ export default function Map({}: Props) {
 				mapTypeControl: false,
 				streetViewControl: true,
 			});
+			let locations = await getLocations()
 			locations.forEach((location) => {
 				let marker = new google.maps.Marker({
 					position: {
