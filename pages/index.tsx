@@ -1,5 +1,5 @@
 import Map from './map';
 function HomePage() {
-  return (<Map/>)
+	return <Map />;
 }
 export default HomePage;
