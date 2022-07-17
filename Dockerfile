@@ -4,5 +4,6 @@ COPY package.json package.json
 COPY bun.lockb bun.lockb
 RUN bun install
 COPY . .
-EXPOSE 3000
-ENTRYPOINT ["bun", "dev"]
+RUN adduser -D myuser
+USER myuser
+CMD bun dev -p $PORT
